@@ -2,10 +2,13 @@
 """
 Test onadata.libs.utils.viewer_tools
 """
+import requests_mock
+from django.conf import settings
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.utils import timezone
+from onadata.libs.exceptions import EnketoError
 
 from onadata.apps.logger.models import XForm
 from onadata.apps.main.tests.test_base import TestBase
@@ -166,11 +169,29 @@ class TestViewerTools(TestBase):
         url = get_form_url(request, username='bob', xform_pk=1)
         self.assertEqual(url, 'https://ona.io/bob/1')
 
-    @override_settings(TESTING_MODE=False)
-    def test_get_submissions_url(self):
-        """Test get_submissions_url()."""
+    @override_settings(TESTING_MODE=False, ENKETO_URL='https://enketo.ona.io')
+    @requests_mock.Mocker()
+    def test_get_submissions_url(self, mocked):
         request = RequestFactory().get('/')
-        url = get_submission_url(
-            request, username="milly", id_string="tag_team")
+        """Test get_submissions_url().
+
+        Ensures appropriate data is being received.
+        """
+        mocked_response = {
+            "single_url": "https://enketo.ona.io/single/::XZqoZ94y",
+            "code": 200
+        }
+
+        enketo_url = settings.ENKETO_URL + "/api/v2/survey/single/once"
+        username = "bob"
+        server_url = get_form_url(
+            request, username, settings.ENKETO_PROTOCOL, True, xform_pk=1)
+
+        url = '{}?server_url={}&form_id={}'.format(
+            enketo_url, server_url, "tag_team")
+        mocked.get(url, json=mocked_response)
+        response = get_submission_url(
+            request, username, id_string="tag_team", xform_pk=1)
+
         self.assertEqual(
-            url, None)
+            response, 'https://enketo.ona.io/single/::XZqoZ94y')
