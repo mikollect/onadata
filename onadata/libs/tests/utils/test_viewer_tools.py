@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Test onadata.libs.utils.viewer_tools
-"""
+"""Test onadata.libs.utils.viewer_tools."""
 import requests_mock
 from django.conf import settings
 from django.http import Http404
@@ -20,22 +18,17 @@ from onadata.libs.utils.viewer_tools import (export_def_from_filename,
 
 
 class TestViewerTools(TestBase):
-    """
-    Test viewer_tools functions
-    """
+    """Test viewer_tools functions."""
+
     def test_export_def_from_filename(self):
-        """
-        Test export_def_from_filename().
-        """
+        """Test export_def_from_filename()."""
         filename = "path/filename.xlsx"
         ext, mime_type = export_def_from_filename(filename)
         self.assertEqual(ext, 'xlsx')
         self.assertEqual(mime_type, 'vnd.openxmlformats')
 
     def test_get_client_ip(self):
-        """
-        Test get_client_ip().
-        """
+        """Test get_client_ip()."""
         request = RequestFactory().get("/")
         client_ip = get_client_ip(request)
         self.assertIsNotNone(client_ip)
@@ -44,9 +37,7 @@ class TestViewerTools(TestBase):
 
     # pylint: disable=C0103
     def test_get_enketo_defaults_without_vars(self):
-        """
-        Test generate_enketo_form_defaults() without vars.
-        """
+        """Test generate_enketo_form_defaults() without vars."""
         # create xform
         self._publish_transportation_form()
         # create map without variables
@@ -57,9 +48,7 @@ class TestViewerTools(TestBase):
 
     # pylint: disable=C0103
     def test_get_enketo_defaults_with_right_xform(self):
-        """
-        Test generate_enketo_form_defaults() with xform vars.
-        """
+        """Test generate_enketo_form_defaults() with xform vars."""
         # create xform
         self._publish_transportation_form()
         # create kwargs with existing xform variable
@@ -75,9 +64,7 @@ class TestViewerTools(TestBase):
 
     # pylint: disable=C0103
     def test_get_enketo_defaults_with_multiple_params(self):
-        """
-        Test generate_enketo_form_defaults() with multiple params
-        """
+        """Test generate_enketo_form_defaults() with multiple params."""
         # create xform
         self._publish_transportation_form()
         # create kwargs with existing xform variable
@@ -105,9 +92,7 @@ class TestViewerTools(TestBase):
 
     # pylint: disable=C0103
     def test_get_enketo_defaults_with_non_existent_field(self):
-        """
-        Test generate_enketo_form_defaults() with non existent field.
-        """
+        """Test generate_enketo_form_defaults() with non existent field."""
         # create xform
         self._publish_transportation_form()
         # create kwargs with NON-existing xform variable
@@ -116,9 +101,7 @@ class TestViewerTools(TestBase):
         self.assertEqual(defaults, {})
 
     def test_get_form(self):
-        """
-        Test get_form().
-        """
+        """Test get_form()."""
         # non existent id_string
         with self.assertRaises(Http404):
             get_form({'id_string': 'non_existent_form'})
@@ -143,9 +126,7 @@ class TestViewerTools(TestBase):
 
     @override_settings(TESTING_MODE=False)
     def test_get_form_url(self):
-        """
-        Test get_form_url()
-        """
+        """Test get_form_url()."""
         request = RequestFactory().get('/')
 
         # default https://ona.io
